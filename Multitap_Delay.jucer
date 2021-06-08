@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="dfUaBp" name="Multi-Tap Delay" projectType="audioplug" useAppConfig="0"
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
+              pluginManufacturer="Manos Labrakis" pluginVST3Category="Delay,Fx">
+  <MAINGROUP id="XiAwXt" name="Multi-Tap Delay">
+    <GROUP id="{C7D75B01-D743-B655-C0B5-CAD06D4086D3}" name="Source">
+      <FILE id="rrvFu7" name="PluginProcessor.cpp" compile="1" resource="0"
+            file="Source/PluginProcessor.cpp"/>
+      <FILE id="EI0t9O" name="PluginProcessor.h" compile="0" resource="0"
+            file="Source/PluginProcessor.h"/>
+      <FILE id="V2SjrF" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/PluginEditor.cpp"/>
+      <FILE id="dqwPe5" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="hfLHkC" name="Pitch.h" compile="0" resource="0" file="Source/Pitch.h"/>
+      <FILE id="ZlcYiI" name="Pitch.cpp" compile="1" resource="0" file="Source/Pitch.cpp"/>
+      <FILE id="e5cTBl" name="Delay.cpp" compile="1" resource="0" file="Source/Delay.cpp"/>
+      <FILE id="I2KxCF" name="Delay.h" compile="0" resource="0" file="Source/Delay.h"/>
+      <FILE id="HCTJPZ" name="GUIGraphics.h" compile="0" resource="0" file="Source/GUIGraphics.h"/>
+      <FILE id="QY4vzZ" name="GUIGraphics.cpp" compile="1" resource="0" file="Source/GUIGraphics.cpp"/>
+    </GROUP>
+    <FILE id="j5qHUb" name="GUI.cpp" compile="1" resource="0" file="Source/GUI.cpp"/>
+    <FILE id="ijGpvg" name="GUI.h" compile="0" resource="0" file="Source/GUI.h"/>
+    <GROUP id="{2B0E699C-BAA9-A538-A26E-7F40AE8A1218}" name="Resources">
+      <FILE id="p76A94" name="knob.png" compile="0" resource="1" file="Resources/knob.png"/>
+      <FILE id="sROsT3" name="background.png" compile="0" resource="1" file="Resources/background.png"/>
+    </GROUP>
+  </MAINGROUP>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
+  <EXPORTFORMATS>
+    <VS2019 targetFolder="Builds/VisualStudio2019" extraLinkerFlags="&quot;SoundTouch.lib&quot;">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="Multi-Tap Delay" headerPath="C:\JUCE\SDK\soundtouch-master\include&#10;C:\JUCE\SDK\soundtouch-master\source\SoundTouch&#10;C:\JUCE\SDK\asiosdk_2.3.3_2019-06-14\common&#10;C:\JUCE\SDK\vstsdk2.4"
+                       libraryPath="C:\Libraries\debug" useRuntimeLibDLL="0"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="Multi-Tap Delay" headerPath="C:\JUCE\SDK\soundtouch-master\include&#10;C:\JUCE\SDK\soundtouch-master\source\SoundTouch&#10;C:\JUCE\SDK\asiosdk_2.3.3_2019-06-14\common&#10;C:\JUCE\SDK\vstsdk2.4"
+                       libraryPath="C:\Libraries\release" useRuntimeLibDLL="0"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../../JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2019>
+  </EXPORTFORMATS>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+  </MODULES>
+  <LIVE_SETTINGS>
+    <WINDOWS/>
+  </LIVE_SETTINGS>
+</JUCERPROJECT>
