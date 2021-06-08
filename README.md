@@ -15,7 +15,7 @@ This repository contains the code for a digital delay VST plugin. This multi-tap
       * Delay 3: Dotted Eighth.
       * Delay 4: Dotted Quarter.
   * Feedback
-    * The Feedback knob controls the amount of the output that's fed back into the delay input. It as shared across all four delay units.
+    * The Feedback knob controls the amount of the output that's fed back into the delay input. It is shared across all four delay units.
   * Tone
     * Just a Low-Pass Filter.
   * Mix
@@ -31,7 +31,7 @@ This repository contains the code for a digital delay VST plugin. This multi-tap
 <br><br />
 
 * The SoundTouch library is also required to compile the Pitch modules. It can be downloaded from the
-[Soundtouch GitLab Repo](https://gitlab.com/soundtouch/soundtouch).
+[Soundtouch GitLab repo](https://gitlab.com/soundtouch/soundtouch).
 
 ### Building the Plug-in
 1. Open with the Projucer application the file with the ".jucer" extension in the root directory of the plug-in you want to build.
