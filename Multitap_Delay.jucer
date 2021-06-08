@@ -19,8 +19,6 @@
       <FILE id="HCTJPZ" name="GUIGraphics.h" compile="0" resource="0" file="Source/GUIGraphics.h"/>
       <FILE id="QY4vzZ" name="GUIGraphics.cpp" compile="1" resource="0" file="Source/GUIGraphics.cpp"/>
     </GROUP>
-    <FILE id="j5qHUb" name="GUI.cpp" compile="1" resource="0" file="Source/GUI.cpp"/>
-    <FILE id="ijGpvg" name="GUI.h" compile="0" resource="0" file="Source/GUI.h"/>
     <GROUP id="{2B0E699C-BAA9-A538-A26E-7F40AE8A1218}" name="Resources">
       <FILE id="p76A94" name="knob.png" compile="0" resource="1" file="Resources/knob.png"/>
       <FILE id="sROsT3" name="background.png" compile="0" resource="1" file="Resources/background.png"/>
