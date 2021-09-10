@@ -16,6 +16,7 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
    
     setSize (600, 430);
 
+
         
     timeSlider.reset(new juce::Slider("new slider"));
     addAndMakeVisible(timeSlider.get());
@@ -52,6 +53,7 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
     detune1Slider->addListener(this);
     detune1Slider->setLookAndFeel(&graphics);
     detune1Slider->setDoubleClickReturnValue(true, 8);
+   
     
 
     
@@ -118,14 +120,19 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
     mixSlider->setDoubleClickReturnValue(true, 25);
    
 
-    timeSlider->setBounds(30, 65, 120, 120);
-    feedbackSlider->setBounds(170, 65, 120, 120);
-    toneSlider->setBounds(310, 65, 120, 120);
-    mixSlider->setBounds(450, 65, 120, 120);
-    detune1Slider->setBounds(73, 190, 150, 145);
-    detune2Slider->setBounds(197, 270, 150, 145);
-    detune3Slider->setBounds(353, 190, 150, 145);
-    detune4Slider->setBounds(435, 270, 150, 145);
+    int knobSize = 90;
+    int xOffset = 15;
+    int yOffset = 115;
+    int detuneKnobSize = 140;
+    
+    timeSlider->setBounds(30 + xOffset - 3, yOffset, knobSize, knobSize);
+    feedbackSlider->setBounds(170 + xOffset, yOffset, knobSize, knobSize);
+    toneSlider->setBounds(310 + xOffset, yOffset, knobSize, knobSize);
+    mixSlider->setBounds(450 + xOffset, yOffset, knobSize, knobSize);
+    detune1Slider->setBounds(73, 190, detuneKnobSize, 145);
+    detune2Slider->setBounds(197, 270, detuneKnobSize, 145);
+    detune3Slider->setBounds(353, 190, detuneKnobSize, 145);
+    detune4Slider->setBounds(435, 270, detuneKnobSize, 145);
 }
 
 Multitap_delayAudioProcessorEditor::~Multitap_delayAudioProcessorEditor()

@@ -3,7 +3,7 @@
 This repository contains the code for a digital delay VST plugin. This multi-tap delay utilizes four delay lines to create a rhythmic pattern with the repeats.
 
 <p align="center">
-  <img width="600" height="430" src="https://user-images.githubusercontent.com/58518865/121102697-f1fa3e00-c806-11eb-8404-15501d55cf0e.png">
+  <img width="600" height="430" src="https://user-images.githubusercontent.com/58518865/132894820-c299b892-eff6-44fa-bf65-0d0192b3a091.png">
 </p>
 
 ### Controls
