@@ -9,7 +9,7 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
     setSize (600, 430);
 
     int startX = 7;
-    int startY = 120;
+    int startY = 100;
     int knobSize = 84;
 
     graphics.setColour (Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
@@ -75,11 +75,8 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
         {
             page1Knobs[knob - 1]->setTextBoxStyle(juce::Slider::NoTextBox, false, 70, 20);
             page1Knobs[knob - 1]->setPopupDisplayEnabled(true, true, getTopLevelComponent());
-            page1Knobs[knob - 1]->setBounds(page1Knobs[knob - 2]->getX() + page1Knobs[knob - 2]->getWidth() - 11,
-                 startY + 110, knobSize - 20, knobSize - 22); //y +70
-
-            //page1Attachments[knob - 1] = std::make_unique<juce::AudioProcessorValueTreeState::
-            //    SliderAttachment>(audioProcessor.apvts, "FEEDBACK_" + std::to_string(knob / 2) + "_ID", *page1Knobs[knob - 1]);
+            page1Knobs[knob - 1]->setBounds(page1Knobs[knob - 2]->getX() + page1Knobs[knob - 2]->getWidth() - 2,
+                 startY + 60, knobSize - 40, knobSize - 42);
         }
         
     } 
@@ -128,10 +125,33 @@ Multitap_delayAudioProcessorEditor::~Multitap_delayAudioProcessorEditor()
 void Multitap_delayAudioProcessorEditor::paint (juce::Graphics& g)
 {
     g.drawImageAt(graphics.getBackground(), 0, 0);
-    g.drawImageAt(screensImage, 0, 0);
+    g.drawImageAt(screensImage, 0, -20);
+
+    labelFont.setBold(false);
+    labelFont.setStyleFlags(juce::Font::FontStyleFlags::plain);
+    g.setFont(labelFont);
+    labelFont.setHeight(14);
 
     g.setColour(juce::Colours::ivory);
-    g.drawFittedText("BPM", bpmTextBox->getBounds().withHeight(24).translated(-bpmTextBox->getWidth() + 2, -1), Justification::centred, 1);
+    g.drawFittedText("BPM", bpmTextBox->getBounds().withHeight(24).translated(-bpmTextBox->getWidth() + 3, -1), Justification::centred, 1);
+    
+    labelFont.setHeight(18);
+
+    for(int knob = 1; knob <= PAGE_ONE_KNOBS; ++knob)
+    {
+        if (knob % 2 != 0)
+        {
+            
+            g.drawFittedText("TIME " + std::to_string((knob + 1) / 2), page1Knobs[knob - 1]->getBounds().withHeight(24).translated(-1, -27), Justification::centred, 1);
+            g.drawFittedText("TIME " + std::to_string((knob + 1) / 2), page1Knobs[knob - 1]->getBounds().withHeight(24).translated(-1, -27), Justification::centred, 1);            
+            
+        }
+        else
+        {
+            g.drawFittedText("FDBK " + std::to_string(knob / 2), page1Knobs[knob - 1]->getBounds().withHeight(24).translated(0, 40), Justification::centred, 1);
+            g.drawFittedText("FDBK " + std::to_string(knob / 2), page1Knobs[knob - 1]->getBounds().withHeight(24).translated(0, 40), Justification::centred, 1);
+        }
+    }
 }
 
 void Multitap_delayAudioProcessorEditor::resized()

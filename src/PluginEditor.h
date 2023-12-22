@@ -74,6 +74,8 @@ private:
     GUIGraphics graphics;
     juce::LookAndFeel_V4 boxLNF;
 
+    juce::Font labelFont{Font{juce::Typeface::createSystemTypefaceFor(BinaryData::varelaround_regular_ttf, BinaryData::varelaround_regular_ttfSize)}};
+
     Multitap_delayAudioProcessor& audioProcessor;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Multitap_delayAudioProcessorEditor)
