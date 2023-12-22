@@ -249,7 +249,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout Multitap_delayAudioProcessor
     for(int delay = 1; delay <= 4; ++delay)
     {
         parameters.push_back(std::make_unique<juce::AudioParameterInt>("DELAY_TIME_" + std::to_string(delay) + 
-            "_ID", "DELAY_TIME" + std::to_string(delay), 95, 1000, 500));
+            "_ID", "DELAY_TIME" + std::to_string(delay), 95, 1500, 500));
 
         parameters.push_back(std::make_unique<juce::AudioParameterFloat>("FEEDBACK_" + std::to_string(delay) + "_ID", 
             "FEEDBACK" + std::to_string(delay), 0.0f, 0.95, 0.7));

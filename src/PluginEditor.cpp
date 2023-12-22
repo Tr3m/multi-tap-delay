@@ -111,6 +111,7 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
     bpmTextBox->onReturnKey = [this]
     {
         audioProcessor.setBPM(bpmTextBox->getText().getIntValue());
+        recalculateDelayTimes();
     };
 
     bpmTextBox->setBounds(40, 3, 50, 20);
@@ -223,6 +224,25 @@ int Multitap_delayAudioProcessorEditor::getTimeBySelection(int comboBoxIndex)
     case TimeDivisions::EigthDotted:
         return quarterMs / 2 + quarterMs / 4;
         break;
+    }
+}
+
+void Multitap_delayAudioProcessorEditor::recalculateDelayTimes()
+{
+    int quarterMs = 60000 / audioProcessor.getBPM();
+
+    for(int delay = 0; delay < 3; ++delay)
+    {
+        auto timeDiv = timeTextBoxes[delay]->getText();
+
+        if(timeDiv == "1/4")
+            page1Knobs[2*delay]->setValue(quarterMs, juce::NotificationType::sendNotification);
+        else if(timeDiv == "1/4.")
+            page1Knobs[2*delay]->setValue(quarterMs + quarterMs / 2, juce::NotificationType::sendNotification);
+        else if(timeDiv == "1/8")
+            page1Knobs[2*delay]->setValue(quarterMs / 2, juce::NotificationType::sendNotification);
+        else if(timeDiv == "1/8.")
+            page1Knobs[2*delay]->setValue(quarterMs / 2 + quarterMs / 4, juce::NotificationType::sendNotification);
     }
 }
 

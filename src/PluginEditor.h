@@ -27,6 +27,7 @@ public:
 
     juce::String getTimeByValue(int delayMs);
     int getTimeBySelection(int comboBoxIndex);
+    void recalculateDelayTimes();
 
     enum KnobsP1
     {
