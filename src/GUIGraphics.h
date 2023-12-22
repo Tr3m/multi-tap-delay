@@ -50,7 +50,7 @@ public:
                 layout.textBoxBounds.setHeight (textBoxHeight);
 
                 if (textBoxPos == Slider::TextBoxLeft)           layout.textBoxBounds.setX (0);
-                else if (textBoxPos == Slider::TextBoxRight)     layout.textBoxBounds.setX (localBounds.getWidth() - textBoxWidth);
+                else if (textBoxPos == Slider::TextBoxRight)     layout.textBoxBounds.setX (localBounds.getWidth() - textBoxWidth - 10);
                 else /* above or below -> centre horizontally */ layout.textBoxBounds.setX ((localBounds.getWidth() - textBoxWidth) / 2);
 
                 if (textBoxPos == Slider::TextBoxAbove)          layout.textBoxBounds.setY (0);
@@ -76,7 +76,7 @@ public:
         else
         {
             if (textBoxPos == Slider::TextBoxLeft)       layout.sliderBounds.removeFromLeft (textBoxWidth);
-            else if (textBoxPos == Slider::TextBoxRight) layout.sliderBounds.removeFromRight (textBoxWidth);
+            else if (textBoxPos == Slider::TextBoxRight) layout.sliderBounds.removeFromRight (textBoxWidth + 15);
             else if (textBoxPos == Slider::TextBoxAbove) layout.sliderBounds.removeFromTop (textBoxHeight);
             else if (textBoxPos == Slider::TextBoxBelow) layout.sliderBounds.removeFromBottom (textBoxHeight + 15);
 

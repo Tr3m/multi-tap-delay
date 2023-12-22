@@ -4,7 +4,7 @@
 #include "PluginProcessor.h"
 #include <GUIGraphics.h>
 
-#define PAGE_ONE_KNOBS 8
+#define NUM_DELAY_KNOBS 8
 
 //==============================================================================
 /**
@@ -59,8 +59,8 @@ public:
 
 private:
     
-    std::unique_ptr<juce::Slider> page1Knobs[PAGE_ONE_KNOBS];
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> page1Attachments[PAGE_ONE_KNOBS];
+    std::unique_ptr<juce::Slider> delayKnobs[NUM_DELAY_KNOBS], detuneKnobs[4];
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> delayKnobAttachments[NUM_DELAY_KNOBS], detuneKnobAttachments[4];
 
     std::unique_ptr<juce::ComboBox> timeComboBoxes[4];
     std::unique_ptr<juce::TextEditor> timeTextBoxes[4];

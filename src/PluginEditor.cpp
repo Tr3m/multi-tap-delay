@@ -15,9 +15,9 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
     graphics.setColour (Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     graphics.setColour (Slider::textBoxBackgroundColourId, juce::Colours::transparentBlack);
     graphics.setColour (Slider::textBoxTextColourId, juce::Colours::ivory.withAlpha(0.85f));
-    graphics.setColour (Slider::textBoxTextColourId, juce::Colours::hotpink);
+    graphics.setColour (Slider::textBoxTextColourId, juce::Colours::ivory);
 
-    boxLNF.setColour(TextEditor::textColourId, Colours::hotpink);
+    boxLNF.setColour(TextEditor::textColourId, Colours::ivory);
     boxLNF.setColour(TextEditor::backgroundColourId, Colours::transparentBlack);
     boxLNF.setColour(TextEditor::outlineColourId, Colours::transparentBlack);
     boxLNF.setColour(PopupMenu::backgroundColourId, Colours::grey.withAlpha(0.6f));
@@ -27,22 +27,19 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
 
     //tooltipWindow.setLookAndFeel(&graphics);
 
-    for(int knob = 1; knob <= PAGE_ONE_KNOBS; ++knob)
+    for(int knob = 1; knob <= NUM_DELAY_KNOBS; ++knob)
     {
-        page1Knobs[knob - 1].reset(new juce::Slider("knob" + std::to_string(knob)));
-        addAndMakeVisible(page1Knobs[knob - 1].get());
-        page1Knobs[knob - 1]->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-        page1Knobs[knob - 1]->setLookAndFeel(&graphics);
-        page1Knobs[knob - 1]->addListener(this);
+        delayKnobs[knob - 1].reset(new juce::Slider("knob" + std::to_string(knob)));
+        addAndMakeVisible(delayKnobs[knob - 1].get());
+        delayKnobs[knob - 1]->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+        delayKnobs[knob - 1]->setLookAndFeel(&graphics);
+        delayKnobs[knob - 1]->addListener(this);
 
         if (knob % 2 != 0)
         {
-            page1Knobs[knob - 1]->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 70, 20);
-            page1Knobs[knob - 1]->setTextValueSuffix(" ms");
-            page1Knobs[knob - 1]->setBounds(startX + (knob - 1) * 70, startY, knobSize + 15, knobSize + 15);
-
-            //page1Attachments[knob - 1] = std::make_unique<juce::AudioProcessorValueTreeState::
-            //    SliderAttachment>(audioProcessor.apvts, "DELAY_TIME_" + std::to_string((knob + 1) / 2) + "_ID", *page1Knobs[knob - 1]);
+            delayKnobs[knob - 1]->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 70, 20);
+            delayKnobs[knob - 1]->setTextValueSuffix(" ms");
+            delayKnobs[knob - 1]->setBounds(startX + (knob - 1) * 70, startY, knobSize + 15, knobSize + 15);
 
             timeTextBoxes[((knob + 1) / 2) - 1].reset(new juce::TextEditor("time" + std::to_string((knob + 1) / 2)));
             addAndMakeVisible(timeTextBoxes[((knob + 1) / 2) - 1].get());
@@ -50,15 +47,14 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
             timeTextBoxes[((knob + 1) / 2) - 1]->setReadOnly(true);
             timeTextBoxes[((knob + 1) / 2) - 1]->setText("1/16.");
 
-            timeTextBoxes[((knob + 1) / 2) - 1]->setBounds(page1Knobs[knob - 1]->getX() + page1Knobs[knob - 1]->getWidth() - 7, 
-                page1Knobs[knob - 1]->getY() + page1Knobs[knob - 1]->getHeight() / 2 - 20, 55, 18);
+            timeTextBoxes[((knob + 1) / 2) - 1]->setBounds(delayKnobs[knob - 1]->getX() + delayKnobs[knob - 1]->getWidth() - 7, 
+                delayKnobs[knob - 1]->getY() + delayKnobs[knob - 1]->getHeight() / 2 - 20, 55, 18);
 
             timeComboBoxes[((knob + 1) / 2) - 1].reset (new juce::ComboBox ("combobox" + std::to_string((knob + 1) / 2)));
             addAndMakeVisible (timeComboBoxes[((knob + 1) / 2) - 1].get());
             timeComboBoxes[((knob + 1) / 2) - 1]->setEditableText (false);
             timeComboBoxes[((knob + 1) / 2) - 1]->setJustificationType (juce::Justification::centredLeft);
             timeComboBoxes[((knob + 1) / 2) - 1]->setTextWhenNothingSelected (TRANS("-"));
-            //timeComboBoxes[((knob + 1) / 2) - 1]->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
             timeComboBoxes[((knob + 1) / 2) - 1]->addItem (TRANS("1/4"), 1);
             timeComboBoxes[((knob + 1) / 2) - 1]->addItem (TRANS("1/4."), 2);
             timeComboBoxes[((knob + 1) / 2) - 1]->addItem (TRANS("1/8"), 3);
@@ -73,26 +69,26 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
         }
         else
         {
-            page1Knobs[knob - 1]->setTextBoxStyle(juce::Slider::NoTextBox, false, 70, 20);
-            page1Knobs[knob - 1]->setPopupDisplayEnabled(true, true, getTopLevelComponent());
-            page1Knobs[knob - 1]->setBounds(page1Knobs[knob - 2]->getX() + page1Knobs[knob - 2]->getWidth() - 2,
+            delayKnobs[knob - 1]->setTextBoxStyle(juce::Slider::NoTextBox, false, 70, 20);
+            delayKnobs[knob - 1]->setPopupDisplayEnabled(true, true, getTopLevelComponent());
+            delayKnobs[knob - 1]->setBounds(delayKnobs[knob - 2]->getX() + delayKnobs[knob - 2]->getWidth() - 2,
                  startY + 60, knobSize - 40, knobSize - 42);
         }
         
     } 
 
     // Attach paramters
-    for(int knob = 1; knob <= PAGE_ONE_KNOBS; ++knob)
+    for(int knob = 1; knob <= NUM_DELAY_KNOBS; ++knob)
     {
         if (knob % 2 != 0)
         {
-            page1Attachments[knob - 1] = std::make_unique<juce::AudioProcessorValueTreeState::
-                SliderAttachment>(audioProcessor.apvts, "DELAY_TIME_" + std::to_string((knob + 1) / 2) + "_ID", *page1Knobs[knob - 1]);
+            delayKnobAttachments[knob - 1] = std::make_unique<juce::AudioProcessorValueTreeState::
+                SliderAttachment>(audioProcessor.apvts, "DELAY_TIME_" + std::to_string((knob + 1) / 2) + "_ID", *delayKnobs[knob - 1]);
         }
         else
         {
-            page1Attachments[knob - 1] = std::make_unique<juce::AudioProcessorValueTreeState::
-                SliderAttachment>(audioProcessor.apvts, "FEEDBACK_" + std::to_string(knob / 2) + "_ID", *page1Knobs[knob - 1]);
+            delayKnobAttachments[knob - 1] = std::make_unique<juce::AudioProcessorValueTreeState::
+                SliderAttachment>(audioProcessor.apvts, "FEEDBACK_" + std::to_string(knob / 2) + "_ID", *delayKnobs[knob - 1]);
         }
     }
 
@@ -100,9 +96,9 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
     addAndMakeVisible(bpmTextBox.get());
     bpmTextBox->setLookAndFeel(&boxLNF);
     bpmTextBox->setText(std::to_string(audioProcessor.getBPM()));
-    bpmTextBox->setColour(TextEditor::textColourId, Colours::hotpink);
+    bpmTextBox->setColour(TextEditor::textColourId, Colours::ivory);
     bpmTextBox->setColour(TextEditor::backgroundColourId, Colours::transparentBlack);
-    bpmTextBox->setColour(TextEditor::outlineColourId, Colours::white.withAlpha(0.55f));
+    bpmTextBox->setColour(TextEditor::outlineColourId, Colours::white.withAlpha(0.35f));
     bpmTextBox->addListener(this);
     bpmTextBox->setInputRestrictions(3, "0123456789");
     bpmTextBox->onReturnKey = [this]
@@ -113,19 +109,39 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
 
     bpmTextBox->setBounds(40, 3, 50, 20);
 
+    for(int dtknob = 0; dtknob < 4; ++dtknob)
+    {
+        detuneKnobs[dtknob].reset(new juce::Slider("dtknob" + std::to_string(dtknob)));
+        addAndMakeVisible(detuneKnobs[dtknob].get());
+        detuneKnobs[dtknob]->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+        detuneKnobs[dtknob]->setLookAndFeel(&graphics);
+        detuneKnobs[dtknob]->addListener(this);
+        detuneKnobs[dtknob]->setTextBoxStyle(juce::Slider::TextBoxRight, false, 55, 20);
+        detuneKnobs[dtknob]->setTextValueSuffix(" ct");
+        detuneKnobAttachments[dtknob] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, 
+            "DETUNE_" + std::to_string(dtknob + 1) + "_ID", *detuneKnobs[dtknob]);
+    }
+
+    detuneKnobs[0]->setBounds(14, 281, knobSize + 32, knobSize - 30);
+    detuneKnobs[1]->setBounds(detuneKnobs[0]->getX() + detuneKnobs[0]->getWidth() + 15, detuneKnobs[0]->getY(), knobSize + 32, knobSize - 30);
+    detuneKnobs[2]->setBounds(65, 332, knobSize + 32, knobSize - 30);
+    detuneKnobs[3]->setBounds(detuneKnobs[2]->getX() + detuneKnobs[2]->getWidth() + 15, detuneKnobs[2]->getY(), knobSize + 32, knobSize - 30);
 }
 
 Multitap_delayAudioProcessorEditor::~Multitap_delayAudioProcessorEditor()
 {
-    for(int att = 0; att < PAGE_ONE_KNOBS; ++att)
-        page1Attachments[att] = nullptr;
+    for(int att = 0; att < NUM_DELAY_KNOBS; ++att)
+        delayKnobAttachments[att] = nullptr;
+
+    for(int dtknob = 0; dtknob < 3; ++dtknob)
+        detuneKnobAttachments[dtknob] = nullptr;
 }
 
 //==============================================================================
 void Multitap_delayAudioProcessorEditor::paint (juce::Graphics& g)
 {
     g.drawImageAt(graphics.getBackground(), 0, 0);
-    g.drawImageAt(screensImage, 0, -20);
+    g.drawImageAt(screensImage, 0, 0);
 
     labelFont.setBold(false);
     labelFont.setStyleFlags(juce::Font::FontStyleFlags::plain);
@@ -136,22 +152,22 @@ void Multitap_delayAudioProcessorEditor::paint (juce::Graphics& g)
     g.drawFittedText("BPM", bpmTextBox->getBounds().withHeight(24).translated(-bpmTextBox->getWidth() + 3, -1), Justification::centred, 1);
     
     labelFont.setHeight(18);
+    g.setFont(labelFont);   
 
-    for(int knob = 1; knob <= PAGE_ONE_KNOBS; ++knob)
+    for(int knob = 1; knob <= NUM_DELAY_KNOBS; ++knob)
     {
         if (knob % 2 != 0)
-        {
-            
-            g.drawFittedText("TIME " + std::to_string((knob + 1) / 2), page1Knobs[knob - 1]->getBounds().withHeight(24).translated(-1, -27), Justification::centred, 1);
-            g.drawFittedText("TIME " + std::to_string((knob + 1) / 2), page1Knobs[knob - 1]->getBounds().withHeight(24).translated(-1, -27), Justification::centred, 1);            
-            
-        }
+            g.drawFittedText("TIME " + std::to_string((knob + 1) / 2), delayKnobs[knob - 1]->getBounds().withHeight(24).translated(-1, -27), Justification::centred, 1);
         else
-        {
-            g.drawFittedText("FDBK " + std::to_string(knob / 2), page1Knobs[knob - 1]->getBounds().withHeight(24).translated(0, 40), Justification::centred, 1);
-            g.drawFittedText("FDBK " + std::to_string(knob / 2), page1Knobs[knob - 1]->getBounds().withHeight(24).translated(0, 40), Justification::centred, 1);
-        }
+            g.drawFittedText("FDBK " + std::to_string(knob / 2), delayKnobs[knob - 1]->getBounds().withHeight(24).translated(0, 40), Justification::centred, 1);
     }
+
+    labelFont.setHeight(11);
+    g.setFont(labelFont);   
+
+    for(int knob = 1; knob <= 4; ++knob)
+        g.drawFittedText("DETUNE  " + std::to_string(knob), detuneKnobs[knob - 1]->getBounds().withHeight(7).translated(21, 2), Justification::centred, 1);
+     
 }
 
 void Multitap_delayAudioProcessorEditor::resized()
@@ -162,22 +178,22 @@ void Multitap_delayAudioProcessorEditor::resized()
 
 void Multitap_delayAudioProcessorEditor::sliderValueChanged(juce::Slider* slider)
 {    
-    if(slider == page1Knobs[KnobsP1::Time1].get())
+    if(slider == delayKnobs[KnobsP1::Time1].get())
     {
         timeTextBoxes[TextBoxesP1::TextBox1]->setText(getTimeByValue(slider->getValue()));
         timeComboBoxes[TextBoxesP1::TextBox1]->setSelectedItemIndex(-1, juce::NotificationType::sendNotification);
     }
-    else if (slider == page1Knobs[KnobsP1::Time2].get())
+    else if (slider == delayKnobs[KnobsP1::Time2].get())
     {
         timeTextBoxes[TextBoxesP1::TextBox2]->setText(getTimeByValue(slider->getValue()));
         timeComboBoxes[TextBoxesP1::TextBox2]->setSelectedItemIndex(-1, juce::NotificationType::sendNotification);
     }
-    else if (slider == page1Knobs[KnobsP1::Time3].get())
+    else if (slider == delayKnobs[KnobsP1::Time3].get())
     {
         timeTextBoxes[TextBoxesP1::TextBox3]->setText(getTimeByValue(slider->getValue()));
         timeComboBoxes[TextBoxesP1::TextBox3]->setSelectedItemIndex(-1, juce::NotificationType::sendNotification);
     }
-    else if (slider == page1Knobs[KnobsP1::Time4].get())
+    else if (slider == delayKnobs[KnobsP1::Time4].get())
     {
         timeTextBoxes[TextBoxesP1::TextBox4]->setText(getTimeByValue(slider->getValue()));
         timeComboBoxes[TextBoxesP1::TextBox4]->setSelectedItemIndex(-1, juce::NotificationType::sendNotification);
@@ -190,19 +206,19 @@ void Multitap_delayAudioProcessorEditor::comboBoxChanged(juce::ComboBox* comboBo
     {
         if(comboBoxThatHasChanged == timeComboBoxes[TextBoxesP1::TextBox1].get())
         {
-            page1Knobs[KnobsP1::Time1]->setValue(getTimeBySelection(comboBoxThatHasChanged->getSelectedItemIndex()), juce::NotificationType::sendNotificationSync);
+            delayKnobs[KnobsP1::Time1]->setValue(getTimeBySelection(comboBoxThatHasChanged->getSelectedItemIndex()), juce::NotificationType::sendNotificationSync);
         }
         else if(comboBoxThatHasChanged == timeComboBoxes[TextBoxesP1::TextBox2].get())
         {
-            page1Knobs[KnobsP1::Time2]->setValue(getTimeBySelection(comboBoxThatHasChanged->getSelectedItemIndex()), juce::NotificationType::sendNotificationSync);
+            delayKnobs[KnobsP1::Time2]->setValue(getTimeBySelection(comboBoxThatHasChanged->getSelectedItemIndex()), juce::NotificationType::sendNotificationSync);
         }
         else if(comboBoxThatHasChanged == timeComboBoxes[TextBoxesP1::TextBox3].get())
         {
-            page1Knobs[KnobsP1::Time3]->setValue(getTimeBySelection(comboBoxThatHasChanged->getSelectedItemIndex()), juce::NotificationType::sendNotificationSync);
+            delayKnobs[KnobsP1::Time3]->setValue(getTimeBySelection(comboBoxThatHasChanged->getSelectedItemIndex()), juce::NotificationType::sendNotificationSync);
         }
         else if(comboBoxThatHasChanged == timeComboBoxes[TextBoxesP1::TextBox4].get())
         {
-            page1Knobs[KnobsP1::Time4]->setValue(getTimeBySelection(comboBoxThatHasChanged->getSelectedItemIndex()), juce::NotificationType::sendNotificationSync);
+            delayKnobs[KnobsP1::Time4]->setValue(getTimeBySelection(comboBoxThatHasChanged->getSelectedItemIndex()), juce::NotificationType::sendNotificationSync);
         }
     }
 }
@@ -256,13 +272,13 @@ void Multitap_delayAudioProcessorEditor::recalculateDelayTimes()
         auto timeDiv = timeTextBoxes[delay]->getText();
 
         if(timeDiv == "1/4")
-            page1Knobs[2*delay]->setValue(quarterMs, juce::NotificationType::sendNotification);
+            delayKnobs[2*delay]->setValue(quarterMs, juce::NotificationType::sendNotification);
         else if(timeDiv == "1/4.")
-            page1Knobs[2*delay]->setValue(quarterMs + quarterMs / 2, juce::NotificationType::sendNotification);
+            delayKnobs[2*delay]->setValue(quarterMs + quarterMs / 2, juce::NotificationType::sendNotification);
         else if(timeDiv == "1/8")
-            page1Knobs[2*delay]->setValue(quarterMs / 2, juce::NotificationType::sendNotification);
+            delayKnobs[2*delay]->setValue(quarterMs / 2, juce::NotificationType::sendNotification);
         else if(timeDiv == "1/8.")
-            page1Knobs[2*delay]->setValue(quarterMs / 2 + quarterMs / 4, juce::NotificationType::sendNotification);
+            delayKnobs[2*delay]->setValue(quarterMs / 2 + quarterMs / 4, juce::NotificationType::sendNotification);
     }
 }
 
