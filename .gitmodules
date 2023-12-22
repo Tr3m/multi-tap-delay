@@ -1,0 +1,3 @@
+[submodule "modules/soundtouch"]
+	path = modules/soundtouch
+	url = https://codeberg.org/soundtouch/soundtouch

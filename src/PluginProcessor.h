@@ -9,8 +9,8 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "Delay.h"
-#include "Pitch.h"
+#include <Delay.h>
+#include <Pitch.h>
 
 //==============================================================================
 /**
@@ -67,6 +67,11 @@ public:
 
     Delay delays[4];
     Pitch pitches[4];
+
+    void updateParameters();
+
+    juce::AudioProcessorValueTreeState apvts;
+    juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
 
 private:
     //==============================================================================

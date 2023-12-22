@@ -19,7 +19,7 @@ Multitap_delayAudioProcessor::Multitap_delayAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       ),
+                       ), apvts(*this, nullptr, "Params", createParameters()),
                             filter(juce::dsp::IIR::Coefficients<float>::makeLowPass(getSampleRate(), toneFreq, 1.0f))
 #endif
 {
@@ -242,18 +242,40 @@ juce::AudioProcessorEditor* Multitap_delayAudioProcessor::createEditor()
     return new Multitap_delayAudioProcessorEditor (*this);
 }
 
+juce::AudioProcessorValueTreeState::ParameterLayout Multitap_delayAudioProcessor::createParameters()
+{
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> parameters;
+
+    for(int delay = 1; delay <= 4; ++delay)
+    {
+        parameters.push_back(std::make_unique<juce::AudioParameterInt>("DELAY_TIME_" + std::to_string(delay) + 
+            "_ID", "DELAY_TIME" + std::to_string(delay), 95, 1000, 500));
+
+        parameters.push_back(std::make_unique<juce::AudioParameterFloat>("FEEDBACK_" + std::to_string(delay) + "_ID", 
+            "FEEDBACK" + std::to_string(delay), 0.0f, 0.95, 0.7));
+    }
+
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("MIX_ID", "MIX", 0.0f, 100.0, 50.0));
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>("LEVEL_ID", "LEVEL", -12.0f, 12.0, 0.0));
+
+    return { parameters.begin(), parameters.end() };
+}
+
 //==============================================================================
 void Multitap_delayAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    auto state = apvts.copyState();
+    std::unique_ptr<juce::XmlElement> xml(state.createXml());
+    copyXmlToBinary(*xml, destData);
 }
 
 void Multitap_delayAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+
+    if (xmlState.get() != nullptr)
+        if (xmlState->hasTagName(apvts.state.getType()))
+            apvts.replaceState(juce::ValueTree::fromXml(*xmlState)); 
 }
 
 void Multitap_delayAudioProcessor::setMix(float newValue)
