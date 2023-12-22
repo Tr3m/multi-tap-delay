@@ -98,6 +98,23 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
                 SliderAttachment>(audioProcessor.apvts, "FEEDBACK_" + std::to_string(knob / 2) + "_ID", *page1Knobs[knob - 1]);
         }
     }
+
+    bpmTextBox.reset(new juce::TextEditor("BPM_BOX"));
+    addAndMakeVisible(bpmTextBox.get());
+    bpmTextBox->setLookAndFeel(&boxLNF);
+    bpmTextBox->setText(std::to_string(audioProcessor.getBPM()));
+    bpmTextBox->setColour(TextEditor::textColourId, Colours::hotpink);
+    bpmTextBox->setColour(TextEditor::backgroundColourId, Colours::transparentBlack);
+    bpmTextBox->setColour(TextEditor::outlineColourId, Colours::white.withAlpha(0.55f));
+    bpmTextBox->addListener(this);
+    bpmTextBox->setInputRestrictions(3, "0123456789");
+    bpmTextBox->onReturnKey = [this]
+    {
+        audioProcessor.setBPM(bpmTextBox->getText().getIntValue());
+    };
+
+    bpmTextBox->setBounds(40, 3, 50, 20);
+
 }
 
 Multitap_delayAudioProcessorEditor::~Multitap_delayAudioProcessorEditor()
@@ -111,6 +128,9 @@ void Multitap_delayAudioProcessorEditor::paint (juce::Graphics& g)
 {
     g.drawImageAt(graphics.getBackground(), 0, 0);
     g.drawImageAt(screensImage, 0, 0);
+
+    g.setColour(juce::Colours::ivory);
+    g.drawFittedText("BPM", bpmTextBox->getBounds().withHeight(24).translated(-bpmTextBox->getWidth() + 2, -1), Justification::centred, 1);
 }
 
 void Multitap_delayAudioProcessorEditor::resized()
@@ -120,8 +140,7 @@ void Multitap_delayAudioProcessorEditor::resized()
 }
 
 void Multitap_delayAudioProcessorEditor::sliderValueChanged(juce::Slider* slider)
-{
-    
+{    
     if(slider == page1Knobs[KnobsP1::Time1].get())
     {
         timeTextBoxes[TextBoxesP1::TextBox1]->setText(getTimeByValue(slider->getValue()));
@@ -142,8 +161,6 @@ void Multitap_delayAudioProcessorEditor::sliderValueChanged(juce::Slider* slider
         timeTextBoxes[TextBoxesP1::TextBox4]->setText(getTimeByValue(slider->getValue()));
         timeComboBoxes[TextBoxesP1::TextBox4]->setSelectedItemIndex(-1, juce::NotificationType::sendNotification);
     }
-
-    
 }
 
 void Multitap_delayAudioProcessorEditor::comboBoxChanged(juce::ComboBox* comboBoxThatHasChanged)
@@ -171,44 +188,45 @@ void Multitap_delayAudioProcessorEditor::comboBoxChanged(juce::ComboBox* comboBo
 
 juce::String Multitap_delayAudioProcessorEditor::getTimeByValue(int delayMs)
 {
-    switch(delayMs)
-    {
-    case 100:
+    int quarterMs = 60000 / audioProcessor.getBPM();
+
+    if(delayMs == quarterMs)
         return "1/4";
-        break;
-    case 200:
+    else if (delayMs == quarterMs + quarterMs / 2)
         return "1/4.";
-        break;
-    case 300: 
+    else if (delayMs == quarterMs / 2)
         return "1/8";
-        break;
-    case 400:
+    else if(delayMs == quarterMs / 2 + quarterMs / 4)
         return "1/8.";
-        break;
-    default:
+    else
         return "-";
-        break;
-    }
+
 }
 
 int Multitap_delayAudioProcessorEditor::getTimeBySelection(int comboBoxIndex)
 {
 
     // Calculate based on BPM
+    int quarterMs = 60000 / audioProcessor.getBPM();
 
     switch(comboBoxIndex)
     {
-    case 0:
-        return 100;
+    case TimeDivisions::Quarter:
+        return quarterMs;
         break;
-    case 1:
-        return 200;
+    case TimeDivisions::QuarterDotted:
+        return quarterMs + quarterMs / 2;
         break;
-    case 2: 
-        return 300;
+    case TimeDivisions::Eighth: 
+        return quarterMs / 2;
         break;
-    case 3:
-        return 400;
+    case TimeDivisions::EigthDotted:
+        return quarterMs / 2 + quarterMs / 4;
         break;
     }
+}
+
+void Multitap_delayAudioProcessorEditor::textEditorTextChanged (TextEditor& textEditor)
+{
+
 }

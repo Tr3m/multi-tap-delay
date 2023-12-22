@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 3.15)
 project(multi_tap_delay VERSION 1.0.0)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+
+set(SOUNDTOUCH_DLL "Build SoundTouchDLL C wrapper library" ON)
+add_subdirectory(modules/soundtouch)
 
 set(PROJECT_NAME "multi_tap_delay")
 

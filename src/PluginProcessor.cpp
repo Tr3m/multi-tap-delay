@@ -261,11 +261,23 @@ juce::AudioProcessorValueTreeState::ParameterLayout Multitap_delayAudioProcessor
     return { parameters.begin(), parameters.end() };
 }
 
+void Multitap_delayAudioProcessor::setBPM(int newBPM)
+{
+    this->BPM = newBPM;
+}
+
+int Multitap_delayAudioProcessor::getBPM()
+{
+    return this->BPM;
+}
+
 //==============================================================================
 void Multitap_delayAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     auto state = apvts.copyState();
     std::unique_ptr<juce::XmlElement> xml(state.createXml());
+    xml->addTextElement("last_bpm");
+    xml->setAttribute("last_bpm", BPM);
     copyXmlToBinary(*xml, destData);
 }
 
@@ -275,7 +287,10 @@ void Multitap_delayAudioProcessor::setStateInformation (const void* data, int si
 
     if (xmlState.get() != nullptr)
         if (xmlState->hasTagName(apvts.state.getType()))
-            apvts.replaceState(juce::ValueTree::fromXml(*xmlState)); 
+        {
+            apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
+            BPM = xmlState->getIntAttribute("last_bpm");
+        }
 }
 
 void Multitap_delayAudioProcessor::setMix(float newValue)

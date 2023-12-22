@@ -73,11 +73,16 @@ public:
     juce::AudioProcessorValueTreeState apvts;
     juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
 
+    void setBPM(int newBPM);
+    int getBPM();
+
 private:
     //==============================================================================
 
     float mixValue = 0.15;
     float toneFreq = 10000.0f;
+
+    int BPM {120};
 
     juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter <float>, juce::dsp::IIR::Coefficients <float>> filter;
 
