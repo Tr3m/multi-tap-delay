@@ -1,28 +1,27 @@
 #pragma once
-#include <utils/CombFilter.h>
-#include <utils/extras/FirstOrderSmoother.h>
+#include <utils/CircularBuffer.h>
 
+#define FEEDBACK_LIMIT 0.99
 
 /**
- * Simple Delay Effect
+ * Basic comb filter implementation
+ * 
  */
 template <typename SampleType>
-class Delay
+class CombFilter
 {
 public:
-    
+
     /**
      * @brief Constructor
-     * 
      */
-    Delay();
+    CombFilter();
 
     /**
      * @brief Destructor
-     * 
      */
-    ~Delay();
-
+    ~CombFilter();
+    
     /**
      * @brief Prepares object for playback
      * 
@@ -31,27 +30,33 @@ public:
     void prepare(SampleType sampleRate);
 
     /**
-     * @brief Sets the delay time
+     * @brief Sets the delay time in milliseconds 
      * 
      * @param delayInMs Delay time in milliseconds
      */
-    void setDelayTime(SampleType delayInMs);
+    void setDelayMs(SampleType delayInMs);
 
     /**
-     * @brief Sets the amount of feedback
+     * @brief Sets the delay time in samples 
      * 
-     * @param newFeedback New feedback value
+     * @param delayInMs Delay time in samples
+     */
+    void setDelaySamples(SampleType delayInSamples);
+
+    /**
+     * @brief Sets the amount of feedback.
      * 
      * Values must range between 0 and 1
+     * 
+     * @param newFeedback Feedback amount
      */
     void setFeedback(SampleType newFeedback);
-
     /**
-     * @brief Sets the delay wet/dry mix
+     * @brief Processes a single sample
      * 
-     * @param newMix New dry/wet mix value
+     * @param input Input sample
      */
-    void setMix(SampleType newMix);
+    SampleType processSample(SampleType input);
 
     /**
      * @brief Processes a memory block that holds audio samples
@@ -62,14 +67,13 @@ public:
      */
     void process(SampleType* channelData, int startSample, int endSample);
 
+
 private:
 
     SampleType sampleRate;
-    CombFilter<SampleType> combFilter;
-    double delayTime {500.0};
-    double feedback {0.7};
-    double mix {0.4};
-
-    FirstOrderSmoother smoother;
+    CircularBuffer<SampleType> circularBuffer;
+    SampleType delayTime {500.0};
+    SampleType feedback {0.0};
+    SampleType lastOutput {0.0};
+    
 };
-

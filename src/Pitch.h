@@ -12,7 +12,7 @@ public:
 
 	
 	void prepare(double sampleRate, int samplesPerBlock, int totalNumInputChannels);
-	void process(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages, int numInputChannels, int numOutputChannels);
+	void process(juce::AudioBuffer<float>& buffer, int numOutputChannels);
 
 	void setParameter(int index, float newValue);
 	float getParameter(int index);

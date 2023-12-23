@@ -8,7 +8,9 @@
 
 #pragma once
 
-#include <JuceHeader.h>
+#include <juce_audio_processors/juce_audio_processors.h>
+#include <utils/extras/AudioChannelUtilities.h>
+#include <utils/extras/GainUtilities.h>
 #include <Delay.h>
 #include <Pitch.h>
 
@@ -53,20 +55,7 @@ public:
 
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
-    void setStateInformation (const void* data, int sizeInBytes) override;
-
-    //Setters and Getters
-    void setTone(float newValue);
-    void setMix(float newValue);
-
-
-    float getTone();
-    int getMix();    
-
-    
-
-    Delay delays[4];
-    Pitch pitches[4];
+    void setStateInformation (const void* data, int sizeInBytes) override;    
 
     void updateParameters();
 
@@ -79,12 +68,16 @@ public:
 private:
     //==============================================================================
 
-    float mixValue = 0.15;
-    float toneFreq = 10000.0f;
+    Delay<float> delays[4];
+    Pitch pitches[4];
+
+    juce::AudioBuffer<float> delayBuffers[4];
 
     int BPM {120};
+    float mix {0.5};
 
-    juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter <float>, juce::dsp::IIR::Coefficients <float>> filter;
+    juce::IIRFilter lowCut, highCut;
+    juce::IIRCoefficients lowCutCoeffs, highCutCoeffs;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Multitap_delayAudioProcessor)
 };

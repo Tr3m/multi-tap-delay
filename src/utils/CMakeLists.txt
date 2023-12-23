@@ -1,0 +1,10 @@
+target_sources(${PROJECT_NAME}
+    PRIVATE
+        CircularBuffer.cpp
+        CircularBuffer.h
+        CombFilter.cpp
+        CombFilter.h
+        extras/FirstOrderSmoother.h
+        extras/AudioChannelUtilities.h
+        extras/GainUtilities.h
+)

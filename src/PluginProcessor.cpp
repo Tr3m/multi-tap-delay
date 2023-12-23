@@ -19,10 +19,13 @@ Multitap_delayAudioProcessor::Multitap_delayAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       ), apvts(*this, nullptr, "Params", createParameters()),
-                            filter(juce::dsp::IIR::Coefficients<float>::makeLowPass(getSampleRate(), toneFreq, 1.0f))
+                       ), apvts(*this, nullptr, "Params", createParameters())
 #endif
 {
+    lowCut.reset();
+    highCut.reset();
+    lowCut.setCoefficients(lowCutCoeffs.makeHighPass(getSampleRate(), 20.0, 1.0f));
+    highCut.setCoefficients(highCutCoeffs.makeLowPass(getSampleRate(), 20000.0, 1.0f));
 }
 
 Multitap_delayAudioProcessor::~Multitap_delayAudioProcessor()
@@ -94,16 +97,20 @@ void Multitap_delayAudioProcessor::changeProgramName (int index, const juce::Str
 //==============================================================================
 void Multitap_delayAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    for (int unitNo = 0; unitNo <= 3; ++unitNo)
+    for (int delay = 0; delay < 4; ++delay)
     {
-        delays[unitNo].prepare(sampleRate, samplesPerBlock);
-        delays[unitNo].setParameter(Delay::Parameters::dryMixParam, 0.0);
-        delays[unitNo].setParameter(Delay::Parameters::wetMixParam, 1.0);
-        delays[unitNo].setParameter(Delay::Parameters::feedbackParam, 0.4);
+        delays[delay].prepare(sampleRate);
+        delays[delay].setMix(1.0);
 
-        pitches[unitNo].prepare(sampleRate, samplesPerBlock, getTotalNumInputChannels());
+        delayBuffers[delay].setSize(1, samplesPerBlock, false, true, false);
+        delayBuffers[delay].clear();
+
+        pitches[delay].prepare(sampleRate, samplesPerBlock, getTotalNumOutputChannels());
     }
 
+    DBG("Prepare Done!");
+
+    /*
     delays[0].setParameter(Delay::Parameters::delayLengthParam, 0.5);
     delays[1].setParameter(Delay::Parameters::delayLengthParam, 0.25);
     delays[2].setParameter(Delay::Parameters::delayLengthParam, 0.37);
@@ -113,15 +120,7 @@ void Multitap_delayAudioProcessor::prepareToPlay (double sampleRate, int samples
     pitches[1].setParameter(Pitch::Parameters::cents, 0.04);
     pitches[2].setParameter(Pitch::Parameters::cents, -0.04);
     pitches[3].setParameter(Pitch::Parameters::cents, -0.08);   
-
-    juce::dsp::ProcessSpec spec;
-    spec.sampleRate = sampleRate;
-    spec.maximumBlockSize = samplesPerBlock;
-    spec.numChannels = getNumOutputChannels();
-
-    filter.reset();
-    filter.prepare(spec);
-        
+    */        
 }
 
 void Multitap_delayAudioProcessor::releaseResources()
@@ -160,26 +159,31 @@ void Multitap_delayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    //Update Filter State
-    *filter.state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(getSampleRate(), toneFreq, 1.0f);
+    //Update Params
+    updateParameters();
     
-    //Initialize delay buffers
-    juce::AudioBuffer<float> buff_1(2, buffer.getNumSamples());
-    juce::AudioBuffer<float> buff_2(2, buffer.getNumSamples());
-    juce::AudioBuffer<float> buff_3(2, buffer.getNumSamples());
-    juce::AudioBuffer<float> buff_4(2, buffer.getNumSamples());
-    
-    //Fill delay buffers
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer(channel);
-        buff_1.copyFrom(channel, 0, buffer.getWritePointer(channel), buffer.getNumSamples());
-        buff_2.copyFrom(channel, 0, buffer.getWritePointer(channel), buffer.getNumSamples());
-        buff_3.copyFrom(channel, 0, buffer.getWritePointer(channel), buffer.getNumSamples());
-        buff_4.copyFrom(channel, 0, buffer.getWritePointer(channel), buffer.getNumSamples());
+    auto* dryData = buffer.getWritePointer(0);
+    auto* dryDataR = buffer.getWritePointer(1);
 
+    //float** bufferPTRs[4];
+    std::vector<float*> bufferPTRs;
+    bufferPTRs.resize(4);
+
+    for (int delay = 0; delay < 4; ++delay)
+        bufferPTRs[delay] = delayBuffers[delay].getWritePointer(0);
+
+    // Process
+    for (int delay = 0; delay < 4; ++delay)  
+    {
+        // Fill delay buffers
+        delayBuffers[delay].copyFrom(0, 0, dryData, buffer.getNumSamples());
+
+        // Process delay and pitch
+        delays[delay].process(bufferPTRs[delay], 0, buffer.getNumSamples());
+        pitches[delay].process(delayBuffers[delay], 1);
     }
 
+    /*
     //Process
     delays[0].process(buff_1, totalNumInputChannels, totalNumOutputChannels);
     pitches[0].process(buff_1, midiMessages, totalNumInputChannels, totalNumOutputChannels);
@@ -192,9 +196,14 @@ void Multitap_delayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
 
     delays[3].process(buff_4, totalNumInputChannels, totalNumOutputChannels);
     pitches[3].process(buff_4, midiMessages, totalNumInputChannels, totalNumOutputChannels);
+    */
 
+    // Sum Wet Buffer
+    for(int sample = 0; sample < buffer.getNumSamples(); ++sample)
+        for (int delay = 1; delay < 4; ++delay)
+            bufferPTRs[0][sample] = (bufferPTRs[0][sample] + bufferPTRs[delay][sample]) / 2;
 
-    //Sum to wet buffer
+    /*
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         
@@ -208,7 +217,22 @@ void Multitap_delayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
         buff_1.applyGain(0.9);
         
     }
+    */
 
+    // Process Filters
+    lowCut.processSamples(bufferPTRs[0], buffer.getNumSamples());
+    highCut.processSamples(bufferPTRs[0], buffer.getNumSamples());
+
+    // SampleType output = (1.0 - mix)*channelData[sample] + mix*processed;
+
+    // Wet/Dry Mix
+    for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
+        dryData[sample] = ((1.0 - mix) * dryData[sample]) + (mix * bufferPTRs[0][sample]);
+
+    // Dual Mono
+    AudioChannelUtilities<float>::doDualMono(dryData, dryDataR, 0, buffer.getNumSamples());
+    
+    /*
     juce::dsp::AudioBlock<float> block(buff_1);
 
     //Fiter Processing
@@ -229,6 +253,29 @@ void Multitap_delayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
             dryData[sample] = dry * dryData[sample] + wet * WetData[sample];
         }
     }
+    */
+}
+
+void Multitap_delayAudioProcessor::updateParameters()
+{
+    // Update Delays and pitch shifters
+    for (int delay = 0; delay < 4; ++delay)
+    {
+        delays[delay].setDelayTime(*apvts.getRawParameterValue("DELAY_TIME_" + std::to_string(delay + 1) + "_ID"));
+        delays[delay].setFeedback(*apvts.getRawParameterValue("FEEDBACK_" + std::to_string(delay + 1) + "_ID"));
+
+        pitches[delay].setParameter(Pitch::Parameters::cents, 
+            *apvts.getRawParameterValue("DETUNE_" + std::to_string(delay + 1) + "_ID") / 100.0);
+    }
+
+    // Update Filter Coeffs
+    lowCut.setCoefficients(lowCutCoeffs.makeHighPass(getSampleRate(), 
+        *apvts.getRawParameterValue("LOWCUT_ID"), 1.0f));
+
+    highCut.setCoefficients(highCutCoeffs.makeLowPass(getSampleRate(),
+        *apvts.getRawParameterValue("HIGHCUT_ID"), 1.0f));
+
+    mix = *apvts.getRawParameterValue("MIX_ID") / 100.0;
 }
 
 //==============================================================================
@@ -296,38 +343,6 @@ void Multitap_delayAudioProcessor::setStateInformation (const void* data, int si
             apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
             BPM = xmlState->getIntAttribute("last_bpm");
         }
-}
-
-void Multitap_delayAudioProcessor::setMix(float newValue)
-{
-    mixValue = newValue;
-    if (mixValue > 100)
-        mixValue = 100;
-    if (mixValue < 0)
-        mixValue = 0;
-
-    mixValue = mixValue / 100;
-}
-
-int Multitap_delayAudioProcessor::getMix()
-{
-    return int(mixValue*100);
-}
-
-void Multitap_delayAudioProcessor::setTone(float newValue)
-{
-    toneFreq = newValue;
-
-    //Bounds Check
-    if (toneFreq > 20000.0f)
-        toneFreq = 20000.0f;
-    if (toneFreq < 450.0f)
-        toneFreq = 450.0f;
-}
-
-float Multitap_delayAudioProcessor::getTone()
-{
-    return toneFreq;
 }
 
 //==============================================================================

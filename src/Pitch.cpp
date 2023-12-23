@@ -32,7 +32,7 @@ void Pitch::prepare(double sampleRate, int samplesPerBlock, int totalNumInputCha
     //setLatencySamples(latency);
 }
 
-void Pitch::process(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages, int totalNumInputChannels, int totalNumOutputChannels)
+void Pitch::process(juce::AudioBuffer<float>& buffer, int totalNumOutputChannels)
 {
 	int numSamples = buffer.getNumSamples();
 

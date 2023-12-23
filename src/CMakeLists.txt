@@ -11,3 +11,6 @@ target_sources(${PROJECT_NAME}
         PluginProcessor.cpp
         PluginProcessor.h    
     )
+
+add_subdirectory(utils)
+include_directories(utils)
