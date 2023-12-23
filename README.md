@@ -1,43 +1,52 @@
-# Overview
+# Multi-Tap Delay
 
-This repository contains the code for a digital delay VST plugin. This multi-tap delay utilizes four delay lines to create a rhythmic pattern with the repeats.
+A Multi-Tap delay audio plug-in that utilizes four delay lines to create a rhythmic pattern with the repeats.
 
 <p align="center">
-  <img width="600" height="430" src="https://user-images.githubusercontent.com/58518865/132894820-c299b892-eff6-44fa-bf65-0d0192b3a091.png">
+  <img width="600" height="430" src="https://cdn.discordapp.com/attachments/580466872169005066/1188166865705500772/screenshot.png?ex=6599899f&is=6587149f&hm=145e7590ea66503d7ee7c422373bee26771137f2da27338640404481c69dee99&">
 </p>
 
 ### Controls
 
   * Time
-    * The Time knob controls the second delay unit's delay length (Which is the shortest of the four). The tempos of the delay units are as follows:
-      * Delay 1: Quarter Note (1/4).
-      * Delay 2: Eighth Note (1/8).
-      * Delay 3: Dotted Eighth.
-      * Delay 4: Dotted Quarter.
+    * The Time knobs control delay time for each delay line.
   * Feedback
-    * The Feedback knob controls the amount of the output that's fed back into the delay input. It is shared across all four delay units.
-  * Tone
-    * Just a Low-Pass Filter.
+    * The Feedback knobs control the amount of the output that's fed back into each delay line.
+  * Low-Cut and Hight-Cut
+    * High and Low Pass filters respectively
   * Mix
     * A unified WET/DRY Control.
-  * The Detune Knobs
+  * Detune
     * The detune knobs can change the pitch of the repeats up to plus or minus of 50 cents.
+  * Sync
+    * Syncs the plug-in's BPM with the host DAW.
 
 
-### Requirements -  Third Party Libraries
+## Building
 
-* The JUCE C++ framework is required in order to build this plug-in. It can be downloaded from the
-[JUCE GitHub repository](https://github.com/juce-framework/JUCE) or the [JUCE Website](https://juce.com/get-juce/download)
-<br><br />
 
-* The SoundTouch library is also required to compile the Pitch modules. It can be downloaded from the
-[Soundtouch GitLab repo](https://gitlab.com/soundtouch/soundtouch).
+### Prerequisites
 
-### Building the Plug-in
-1. Open with the Projucer application the file with the ".jucer" extension in the root directory of the plug-in you want to build.
 
-2. In the exporters tab, add the exporter of your choice based on your OS.
+A global installation of [JUCE](https://github.com/juce-framework/JUCE) is required in order to build the project using CMake. After cloning the JUCE repo, a global installation can be built by running:
 
-3. The soundtouch source files need to be included in the header search paths.
+```bash
+cmake -B cmake-build-install -DCMAKE_INSTALL_PREFIX=/path/to/JUCE/install
+cmake --build cmake-build-install --target install
+```
 
-3. Click the "Save and open in IDE" button on the top right to open the project. (Projucer will auto generate the appropriate library files).
+### Building on Windows
+
+```bash
+git submodule update --init --recursive
+cmake -B build -DCMAKE_PREFIX_PATH=/path/to/JUCE/install
+cmake --build build --config Release
+```
+
+### Building on MacOS/Linux
+
+```bash
+git submodule update --init --recursive
+cmake -B build -DCMAKE_PREFIX_PATH=/path/to/JUCE/install -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+```
