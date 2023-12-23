@@ -1,11 +1,3 @@
-/*
-  ==============================================================================
-
-    This file contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
-*/
-
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
@@ -78,6 +70,8 @@ private:
 
     juce::IIRFilter lowCut, highCut;
     juce::IIRCoefficients lowCutCoeffs, highCutCoeffs;
+
+    //juce::AudioPlayHead playHead;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Multitap_delayAudioProcessor)
 };

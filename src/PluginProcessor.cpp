@@ -1,11 +1,3 @@
-/*
-  ==============================================================================
-
-    This file contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
-*/
-
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
@@ -105,22 +97,8 @@ void Multitap_delayAudioProcessor::prepareToPlay (double sampleRate, int samples
         delayBuffers[delay].setSize(1, samplesPerBlock, false, true, false);
         delayBuffers[delay].clear();
 
-        pitches[delay].prepare(sampleRate, samplesPerBlock, getTotalNumOutputChannels());
-    }
-
-    DBG("Prepare Done!");
-
-    /*
-    delays[0].setParameter(Delay::Parameters::delayLengthParam, 0.5);
-    delays[1].setParameter(Delay::Parameters::delayLengthParam, 0.25);
-    delays[2].setParameter(Delay::Parameters::delayLengthParam, 0.37);
-    delays[3].setParameter(Delay::Parameters::delayLengthParam, 0.75);
-
-    pitches[0].setParameter(Pitch::Parameters::cents, 0.08); //min -0,5 max 0,5
-    pitches[1].setParameter(Pitch::Parameters::cents, 0.04);
-    pitches[2].setParameter(Pitch::Parameters::cents, -0.04);
-    pitches[3].setParameter(Pitch::Parameters::cents, -0.08);   
-    */        
+        pitches[delay].prepare(sampleRate, samplesPerBlock, 1);
+    }    
 }
 
 void Multitap_delayAudioProcessor::releaseResources()
@@ -165,7 +143,6 @@ void Multitap_delayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     auto* dryData = buffer.getWritePointer(0);
     auto* dryDataR = buffer.getWritePointer(1);
 
-    //float** bufferPTRs[4];
     std::vector<float*> bufferPTRs;
     bufferPTRs.resize(4);
 
@@ -183,47 +160,15 @@ void Multitap_delayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
         pitches[delay].process(delayBuffers[delay], 1);
     }
 
-    /*
-    //Process
-    delays[0].process(buff_1, totalNumInputChannels, totalNumOutputChannels);
-    pitches[0].process(buff_1, midiMessages, totalNumInputChannels, totalNumOutputChannels);
-
-    delays[1].process(buff_2, totalNumInputChannels, totalNumOutputChannels);
-    pitches[1].process(buff_2, midiMessages, totalNumInputChannels, totalNumOutputChannels);
-
-    delays[2].process(buff_3, totalNumInputChannels, totalNumOutputChannels);
-    pitches[2].process(buff_3, midiMessages, totalNumInputChannels, totalNumOutputChannels);
-
-    delays[3].process(buff_4, totalNumInputChannels, totalNumOutputChannels);
-    pitches[3].process(buff_4, midiMessages, totalNumInputChannels, totalNumOutputChannels);
-    */
-
     // Sum Wet Buffer
     for(int sample = 0; sample < buffer.getNumSamples(); ++sample)
         for (int delay = 1; delay < 4; ++delay)
             bufferPTRs[0][sample] = (bufferPTRs[0][sample] + bufferPTRs[delay][sample]) / 2;
 
-    /*
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        
-        buff_1.addFrom(channel, 0, buff_2.getWritePointer(channel), buffer.getNumSamples());
-        buff_1.applyGain(0.9);
-
-        buff_1.addFrom(channel, 0, buff_3.getWritePointer(channel), buffer.getNumSamples());
-        buff_1.applyGain(0.9);
-     
-        buff_1.addFrom(channel, 0, buff_4.getWritePointer(channel), buffer.getNumSamples());
-        buff_1.applyGain(0.9);
-        
-    }
-    */
-
     // Process Filters
     lowCut.processSamples(bufferPTRs[0], buffer.getNumSamples());
     highCut.processSamples(bufferPTRs[0], buffer.getNumSamples());
 
-    // SampleType output = (1.0 - mix)*channelData[sample] + mix*processed;
 
     // Wet/Dry Mix
     for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
@@ -231,29 +176,6 @@ void Multitap_delayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
 
     // Dual Mono
     AudioChannelUtilities<float>::doDualMono(dryData, dryDataR, 0, buffer.getNumSamples());
-    
-    /*
-    juce::dsp::AudioBlock<float> block(buff_1);
-
-    //Fiter Processing
-    filter.process(juce::dsp::ProcessContextReplacing<float>(block));
-
-   
-    float wet = 0.0 + mixValue;
-    float dry = 1.0 - mixValue;
-
-    //WET/DRY Control
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* dryData = buffer.getWritePointer(channel);
-        auto* WetData = buff_1.getWritePointer(channel);
-
-        for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
-        {
-            dryData[sample] = dry * dryData[sample] + wet * WetData[sample];
-        }
-    }
-    */
 }
 
 void Multitap_delayAudioProcessor::updateParameters()
