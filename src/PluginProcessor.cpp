@@ -138,7 +138,7 @@ void Multitap_delayAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
     //Update Params
-    updateParameters();
+    updateParameters();    
     
     auto* dryData = buffer.getWritePointer(0);
     auto* dryDataR = buffer.getWritePointer(1);
@@ -198,6 +198,16 @@ void Multitap_delayAudioProcessor::updateParameters()
         *apvts.getRawParameterValue("HIGHCUT_ID"), 1.0f));
 
     mix = *apvts.getRawParameterValue("MIX_ID") / 100.0;
+
+    if(!JUCEApplication::isStandaloneApp())
+    {
+        if(*apvts.getRawParameterValue("SYNC_ON_ID"))
+        {
+            playHead = this->getPlayHead();
+            playHead->getCurrentPosition (currentPositionInfo);
+            setBPM(static_cast<int>(currentPositionInfo.bpm));
+        }
+    }
 }
 
 //==============================================================================
@@ -230,6 +240,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout Multitap_delayAudioProcessor
     parameters.push_back(std::make_unique<juce::AudioParameterFloat>("MIX_ID", "MIX", 0.0f, 100.0, 50.0));
     parameters.push_back(std::make_unique<juce::AudioParameterInt>("LOWCUT_ID", "LOWCUT", 20, 2000, 20));
     parameters.push_back(std::make_unique<juce::AudioParameterInt>("HIGHCUT_ID", "HIGHCUT", 200, 20000, 20000));
+
+    if(!JUCEApplication::isStandaloneApp())
+        parameters.push_back(std::make_unique<juce::AudioParameterBool>("SYNC_ON_ID", "SYNC_ON", false, "SYNC_ON"));
 
 
     return { parameters.begin(), parameters.end() };

@@ -12,7 +12,8 @@
 class Multitap_delayAudioProcessorEditor  : public juce::AudioProcessorEditor, 
                                             public juce::Slider::Listener,
                                             public juce::ComboBox::Listener,
-                                            public juce::TextEditor::Listener
+                                            public juce::TextEditor::Listener,
+                                            public juce::Timer
 {
 public:
     Multitap_delayAudioProcessorEditor (Multitap_delayAudioProcessor&);
@@ -24,6 +25,7 @@ public:
     void sliderValueChanged(juce::Slider* slider) override;
     void comboBoxChanged(juce::ComboBox* comboBoxThatHasChanged) override;
     void textEditorTextChanged (TextEditor& textEditor) override;
+    void timerCallback() override;
 
     juce::String getTimeByValue(int delayMs);
     int getTimeBySelection(int comboBoxIndex);
@@ -62,6 +64,9 @@ private:
     std::unique_ptr<juce::Slider> delayKnobs[NUM_DELAY_KNOBS], detuneKnobs[4], filterKnobs[3];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> delayKnobAttachments[NUM_DELAY_KNOBS], detuneKnobAttachments[4], 
       filterKnobAttachments[3];
+
+    std::unique_ptr<juce::TextButton> syncButton;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> syncButtonAttachment;      
 
     std::unique_ptr<juce::ComboBox> timeComboBoxes[4];
     std::unique_ptr<juce::TextEditor> timeTextBoxes[4];

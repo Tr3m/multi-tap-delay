@@ -15,11 +15,6 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-if(NOT CMAKE_PREFIX_PATH)
-    set(CMAKE_PREFIX_PATH "~/JUCE_7.0.1")
-endif()
-
-#add_subdirectory(Modules/JUCE)
 find_package(JUCE CONFIG REQUIRED)
 
 juce_add_plugin(${PROJECT_NAME}

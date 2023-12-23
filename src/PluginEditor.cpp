@@ -16,6 +16,10 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
     graphics.setColour (Slider::textBoxBackgroundColourId, juce::Colours::transparentBlack);
     graphics.setColour (Slider::textBoxTextColourId, juce::Colours::ivory.withAlpha(0.85f));
     graphics.setColour (Slider::textBoxTextColourId, juce::Colours::ivory);
+    graphics.setColour (TextButton::buttonOnColourId, juce::Colours::lime.withAlpha(0.65f));
+    graphics.setColour (TextButton::buttonColourId, juce::Colours::transparentBlack);
+    graphics.setColour (TextButton::textColourOnId, juce::Colours::ivory);
+    graphics.setColour (TextButton::textColourOffId, juce::Colours::ivory);
 
     reverseKnobLNF.setColour (Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     reverseKnobLNF.setColour (Slider::textBoxBackgroundColourId, juce::Colours::transparentBlack);
@@ -158,6 +162,23 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
 
     filterKnobAttachments[2] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, 
         "MIX_ID", *filterKnobs[2]);
+
+    
+    if(!JUCEApplication::isStandaloneApp())
+    {
+        // BPM Sync Button
+        syncButton.reset(new juce::TextButton("SyncButton"));
+        addAndMakeVisible(syncButton.get());
+        syncButton->setButtonText("SYNC");
+        syncButton->setLookAndFeel(&graphics);
+        syncButton->setBounds(bpmTextBox->getX() + bpmTextBox->getWidth() + 5, bpmTextBox->getY() + 1, bpmTextBox->getWidth() - 10, bpmTextBox->getHeight());
+        syncButton->setToggleable(true);
+        syncButton->setClickingTogglesState(true);
+
+        syncButtonAttachment.reset(new juce::AudioProcessorValueTreeState::ButtonAttachment(audioProcessor.apvts, "SYNC_ON_ID", *syncButton));
+
+        startTimerHz(30);    
+    }
 }
 
 Multitap_delayAudioProcessorEditor::~Multitap_delayAudioProcessorEditor()
@@ -170,6 +191,9 @@ Multitap_delayAudioProcessorEditor::~Multitap_delayAudioProcessorEditor()
 
     for(int dtknob = 0; dtknob < 2; ++dtknob)
         filterKnobAttachments[dtknob] = nullptr;
+
+    if(!JUCEApplication::isStandaloneApp())
+        syncButtonAttachment = nullptr;
 }
 
 //==============================================================================
@@ -315,7 +339,7 @@ void Multitap_delayAudioProcessorEditor::recalculateDelayTimes()
 {
     int quarterMs = 60000 / audioProcessor.getBPM();
 
-    for(int delay = 0; delay < 3; ++delay)
+    for(int delay = 0; delay < 4; ++delay)
     {
         auto timeDiv = timeTextBoxes[delay]->getText();
 
@@ -331,6 +355,22 @@ void Multitap_delayAudioProcessorEditor::recalculateDelayTimes()
 }
 
 void Multitap_delayAudioProcessorEditor::textEditorTextChanged (TextEditor& textEditor)
-{
+{   
+    if(!JUCEApplication::isStandaloneApp())
+        if(&textEditor == bpmTextBox.get())
+            if(*audioProcessor.apvts.getRawParameterValue("SYNC_ON_ID"))
+                recalculateDelayTimes();
+}
 
+void Multitap_delayAudioProcessorEditor::timerCallback()
+{
+    if(*audioProcessor.apvts.getRawParameterValue("SYNC_ON_ID"))
+    {
+        bpmTextBox->setReadOnly(true);
+        bpmTextBox->setText(std::to_string(audioProcessor.getBPM()));
+    }
+    else
+    {
+        bpmTextBox->setReadOnly(false);
+    }
 }

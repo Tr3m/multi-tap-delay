@@ -71,7 +71,8 @@ private:
     juce::IIRFilter lowCut, highCut;
     juce::IIRCoefficients lowCutCoeffs, highCutCoeffs;
 
-    //juce::AudioPlayHead playHead;
+    juce::AudioPlayHead* playHead;
+    juce::AudioPlayHead::CurrentPositionInfo currentPositionInfo;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Multitap_delayAudioProcessor)
 };
