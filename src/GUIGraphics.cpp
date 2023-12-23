@@ -1,8 +1,11 @@
 #include "GUIGraphics.h"
 
-GUIGraphics::GUIGraphics()
+GUIGraphics::GUIGraphics(bool reverseKnob)
 {
-    knobImage = juce::ImageFileFormat::loadFrom(BinaryData::knob_png, BinaryData::knob_pngSize);
+    if(reverseKnob)
+        knobImage = juce::ImageFileFormat::loadFrom(BinaryData::knob_reverse_png, BinaryData::knob_reverse_pngSize);
+    else
+        knobImage = juce::ImageFileFormat::loadFrom(BinaryData::knob_png, BinaryData::knob_pngSize);
 }
 
 

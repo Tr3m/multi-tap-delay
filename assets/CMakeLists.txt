@@ -2,6 +2,7 @@ juce_add_binary_data(BinaryData SOURCES
     background.png
     labels1.png
     knob.png
+    knob_reverse.png
     varela-round.regular.ttf
 )
 

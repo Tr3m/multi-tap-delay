@@ -59,8 +59,9 @@ public:
 
 private:
     
-    std::unique_ptr<juce::Slider> delayKnobs[NUM_DELAY_KNOBS], detuneKnobs[4];
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> delayKnobAttachments[NUM_DELAY_KNOBS], detuneKnobAttachments[4];
+    std::unique_ptr<juce::Slider> delayKnobs[NUM_DELAY_KNOBS], detuneKnobs[4], filterKnobs[3];
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> delayKnobAttachments[NUM_DELAY_KNOBS], detuneKnobAttachments[4], 
+      filterKnobAttachments[3];
 
     std::unique_ptr<juce::ComboBox> timeComboBoxes[4];
     std::unique_ptr<juce::TextEditor> timeTextBoxes[4];
@@ -71,7 +72,7 @@ private:
 
     juce::Image screensImage = juce::ImageFileFormat::loadFrom(BinaryData::labels1_png, BinaryData::labels1_pngSize);
 
-    GUIGraphics graphics;
+    GUIGraphics graphics, reverseKnobLNF{true};
     juce::LookAndFeel_V4 boxLNF;
 
     juce::Font labelFont{Font{juce::Typeface::createSystemTypefaceFor(BinaryData::varelaround_regular_ttf, BinaryData::varelaround_regular_ttfSize)}};

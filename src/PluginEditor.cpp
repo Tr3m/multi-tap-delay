@@ -17,6 +17,11 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
     graphics.setColour (Slider::textBoxTextColourId, juce::Colours::ivory.withAlpha(0.85f));
     graphics.setColour (Slider::textBoxTextColourId, juce::Colours::ivory);
 
+    reverseKnobLNF.setColour (Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+    reverseKnobLNF.setColour (Slider::textBoxBackgroundColourId, juce::Colours::transparentBlack);
+    reverseKnobLNF.setColour (Slider::textBoxTextColourId, juce::Colours::ivory.withAlpha(0.85f));
+    reverseKnobLNF.setColour (Slider::textBoxTextColourId, juce::Colours::ivory);
+
     boxLNF.setColour(TextEditor::textColourId, Colours::ivory);
     boxLNF.setColour(TextEditor::backgroundColourId, Colours::transparentBlack);
     boxLNF.setColour(TextEditor::outlineColourId, Colours::transparentBlack);
@@ -25,8 +30,7 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
     boxLNF.setColour(ComboBox::outlineColourId, Colours::grey.withAlpha(0.0f));
     boxLNF.setColour(ComboBox::textColourId, Colours::grey.withAlpha(0.0f));
 
-    //tooltipWindow.setLookAndFeel(&graphics);
-
+    // Time and Feedback Knobs
     for(int knob = 1; knob <= NUM_DELAY_KNOBS; ++knob)
     {
         delayKnobs[knob - 1].reset(new juce::Slider("knob" + std::to_string(knob)));
@@ -77,7 +81,7 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
         
     } 
 
-    // Attach paramters
+    // Attach paramters for Time and Feedback
     for(int knob = 1; knob <= NUM_DELAY_KNOBS; ++knob)
     {
         if (knob % 2 != 0)
@@ -92,6 +96,7 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
         }
     }
 
+    // BPM TextBox
     bpmTextBox.reset(new juce::TextEditor("BPM_BOX"));
     addAndMakeVisible(bpmTextBox.get());
     bpmTextBox->setLookAndFeel(&boxLNF);
@@ -109,13 +114,13 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
 
     bpmTextBox->setBounds(40, 3, 50, 20);
 
+    // Detune Knobs
     for(int dtknob = 0; dtknob < 4; ++dtknob)
     {
         detuneKnobs[dtknob].reset(new juce::Slider("dtknob" + std::to_string(dtknob)));
         addAndMakeVisible(detuneKnobs[dtknob].get());
         detuneKnobs[dtknob]->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
         detuneKnobs[dtknob]->setLookAndFeel(&graphics);
-        detuneKnobs[dtknob]->addListener(this);
         detuneKnobs[dtknob]->setTextBoxStyle(juce::Slider::TextBoxRight, false, 55, 20);
         detuneKnobs[dtknob]->setTextValueSuffix(" ct");
         detuneKnobAttachments[dtknob] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, 
@@ -124,8 +129,35 @@ Multitap_delayAudioProcessorEditor::Multitap_delayAudioProcessorEditor (Multitap
 
     detuneKnobs[0]->setBounds(14, 281, knobSize + 32, knobSize - 30);
     detuneKnobs[1]->setBounds(detuneKnobs[0]->getX() + detuneKnobs[0]->getWidth() + 15, detuneKnobs[0]->getY(), knobSize + 32, knobSize - 30);
-    detuneKnobs[2]->setBounds(65, 332, knobSize + 32, knobSize - 30);
+    detuneKnobs[2]->setBounds(65, 342, knobSize + 32, knobSize - 30);
     detuneKnobs[3]->setBounds(detuneKnobs[2]->getX() + detuneKnobs[2]->getWidth() + 15, detuneKnobs[2]->getY(), knobSize + 32, knobSize - 30);
+
+    // Mix and Filter Knobs
+    for(int knob = 0; knob < 3; ++knob)
+    {
+        filterKnobs[knob].reset(new juce::Slider("filterKnob" + std::to_string(knob)));
+        addAndMakeVisible(filterKnobs[knob].get());
+        filterKnobs[knob]->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+        filterKnobs[knob]->setLookAndFeel(&graphics);
+        filterKnobs[knob]->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 70, 20);
+        if(knob > 1)
+            filterKnobs[knob]->setTextValueSuffix(" %");
+        else
+            filterKnobs[knob]->setTextValueSuffix(" Hz");
+
+        filterKnobs[knob]->setBounds(delayKnobs[KnobsP1::Time3]->getX() + 35 + (knob * 90), startY + 189, knobSize + 15, knobSize + 15);        
+    }
+
+    filterKnobs[1]->setLookAndFeel(&reverseKnobLNF);
+
+    filterKnobAttachments[0] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, 
+        "LOWCUT_ID", *filterKnobs[0]);
+    
+    filterKnobAttachments[1] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, 
+        "HIGHCUT_ID", *filterKnobs[1]);
+
+    filterKnobAttachments[2] = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, 
+        "MIX_ID", *filterKnobs[2]);
 }
 
 Multitap_delayAudioProcessorEditor::~Multitap_delayAudioProcessorEditor()
@@ -135,6 +167,9 @@ Multitap_delayAudioProcessorEditor::~Multitap_delayAudioProcessorEditor()
 
     for(int dtknob = 0; dtknob < 3; ++dtknob)
         detuneKnobAttachments[dtknob] = nullptr;
+
+    for(int dtknob = 0; dtknob < 2; ++dtknob)
+        filterKnobAttachments[dtknob] = nullptr;
 }
 
 //==============================================================================
@@ -149,17 +184,30 @@ void Multitap_delayAudioProcessorEditor::paint (juce::Graphics& g)
     labelFont.setHeight(14);
 
     g.setColour(juce::Colours::ivory);
-    g.drawFittedText("BPM", bpmTextBox->getBounds().withHeight(24).translated(-bpmTextBox->getWidth() + 3, -1), Justification::centred, 1);
-    
-    labelFont.setHeight(18);
-    g.setFont(labelFont);   
+    g.drawFittedText("BPM", bpmTextBox->getBounds().withHeight(24).translated(-bpmTextBox->getWidth() + 3, -1), Justification::centred, 1);  
+
+    labelFont.setHeight(14);
+    g.setFont(labelFont); 
+
+    g.drawFittedText("LOW-CUT", filterKnobs[0]->getBounds().withHeight(24).translated(-1, -27), Justification::centred, 1);
+    g.drawFittedText("HIGH-CUT", filterKnobs[1]->getBounds().withHeight(24).translated(-1, -27), Justification::centred, 1);
+    g.drawFittedText("MIX", filterKnobs[2]->getBounds().withHeight(24).translated(-1, -27), Justification::centred, 1);
 
     for(int knob = 1; knob <= NUM_DELAY_KNOBS; ++knob)
     {
         if (knob % 2 != 0)
+        {
+            labelFont.setHeight(16);
+            g.setFont(labelFont); 
             g.drawFittedText("TIME " + std::to_string((knob + 1) / 2), delayKnobs[knob - 1]->getBounds().withHeight(24).translated(-1, -27), Justification::centred, 1);
+        }
+            
         else
+        {
+            labelFont.setHeight(12);
+            g.setFont(labelFont); 
             g.drawFittedText("FDBK " + std::to_string(knob / 2), delayKnobs[knob - 1]->getBounds().withHeight(24).translated(0, 40), Justification::centred, 1);
+        }
     }
 
     labelFont.setHeight(11);
