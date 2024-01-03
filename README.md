@@ -3,7 +3,7 @@
 A Multi-Tap delay audio plug-in that utilizes four delay lines to create a rhythmic pattern with the repeats.
 
 <p align="center">
-  <img width="600" height="430" src="https://cdn.discordapp.com/attachments/580466872169005066/1188166865705500772/screenshot.png?ex=6599899f&is=6587149f&hm=145e7590ea66503d7ee7c422373bee26771137f2da27338640404481c69dee99&">
+  <img src="https://cdn.discordapp.com/attachments/580466872169005066/1188166865705500772/screenshot.png?ex=6599899f&is=6587149f&hm=145e7590ea66503d7ee7c422373bee26771137f2da27338640404481c69dee99&">
 </p>
 
 ### Controls
