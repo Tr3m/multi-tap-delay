@@ -3,13 +3,13 @@
 A Multi-Tap delay audio plug-in that utilizes four delay lines to create a rhythmic pattern with the repeats.
 
 <p align="center">
-  <img src="https://cdn.discordapp.com/attachments/580466872169005066/1188166865705500772/screenshot.png?ex=6599899f&is=6587149f&hm=145e7590ea66503d7ee7c422373bee26771137f2da27338640404481c69dee99&">
+  <img src="https://loudsample.com/images/assets/delay/screenshot.png">
 </p>
 
 ### Controls
 
   * Time
-    * The Time knobs control delay time for each delay line.
+    * The Time knobs control the delay time for each delay line.
   * Feedback
     * The Feedback knobs control the amount of the output that's fed back into each delay line.
   * Low-Cut and Hight-Cut
